@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Nearby Jobs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0c0c0b;
+  --ink2:#161614;
+  --rule:#2a2a27;
+  --rule2:#3c3c38;
+  --cream:#f0ebe1;
+  --cream2:#c8c2b5;
+  --amber:#c47f1a;
+  --amber2:#e09a30;
+  --muted:#6b6860;
+  --white:#faf8f4;
+  --ff-d:'Bebas Neue',sans-serif;
+  --ff-b:'Crimson Pro',serif;
+  --ff-m:'DM Mono',monospace;
+}
+body{
+  background:var(--ink);
+  color:var(--cream);
+  font-family:var(--ff-b);
+  font-weight:300;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+/* Grain overlay */
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:999;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  opacity:.6;
+}
+
+/* ── HEADER ── */
+header{
+  border-bottom:1px solid var(--rule);
+  position:relative;
+  overflow:hidden;
+}
+.header-top-line{
+  height:2px;
+  background:var(--amber);
+  transform-origin:left;
+  animation:grow .9s cubic-bezier(.16,1,.3,1) forwards;
+}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.header-inner{
+  max-width:960px;
+  margin:0 auto;
+  padding:2.8rem 2.5rem 2.4rem;
+  display:grid;
+  grid-template-columns:1fr auto;
+  align-items:end;
+  gap:1.5rem;
+}
+.brand-label{
+  font-family:var(--ff-m);
+  font-size:.6rem;
+  letter-spacing:.28em;
+  color:var(--amber);
+  text-transform:uppercase;
+  margin-bottom:.5rem;
+  animation:up .6s cubic-bezier(.16,1,.3,1) .15s both;
+}
+h1{
+  font-family:var(--ff-d);
+  font-size:clamp(3.5rem,9vw,6.5rem);
+  line-height:.9;
+  letter-spacing:.04em;
+  color:var(--white);
+  animation:up .7s cubic-bezier(.16,1,.3,1) .25s both;
+}
+.tagline{
+  font-family:var(--ff-b);
+  font-style:italic;
+  font-size:1.05rem;
+  color:var(--muted);
+  margin-top:.5rem;
+  animation:up .7s cubic-bezier(.16,1,.3,1) .4s both;
+}
+.header-badge{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:.5rem;
+  animation:up .7s cubic-bezier(.16,1,.3,1) .5s both;
+}
+.live-dot{
+  display:flex;
+  align-items:center;
+  gap:.5rem;
+  font-family:var(--ff-m);
+  font-size:.6rem;
+  color:var(--muted);
+  letter-spacing:.12em;
+}
+.dot{
+  width:7px;height:7px;
+  border-radius:50%;
+  background:var(--amber);
+  animation:pulse 2.2s ease infinite;
+}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.65)}}
+.version{
+  font-family:var(--ff-m);
+  font-size:.58rem;
+  color:var(--rule2);
+  letter-spacing:.1em;
+}
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── MAIN ── */
+main{
+  max-width:960px;
+  margin:0 auto;
+  padding:0 2.5rem;
+  width:100%;
+  flex:1;
+}
+
+/* ── CONTROLS ── */
+.controls{
+  padding:2.8rem 0 2.2rem;
+  border-bottom:1px solid var(--rule);
+  animation:up .7s cubic-bezier(.16,1,.3,1) .55s both;
+}
+
+/* Search bar */
+.search-wrap{
+  position:relative;
+}
+.search-field-label{
+  font-family:var(--ff-m);
+  font-size:.55rem;
+  letter-spacing:.22em;
+  color:var(--amber);
+  text-transform:uppercase;
+  position:absolute;
+  top:-.62rem;
+  left:.9rem;
+  background:var(--ink);
+  padding:0 .35rem;
+  z-index:1;
+}
+.search-row{
+  display:flex;
+  border:1px solid var(--rule2);
+  transition:border-color .2s;
+}
+.search-row:focus-within{border-color:var(--amber)}
+#searchInput{
+  flex:1;
+  background:transparent;
+  border:none;
+  outline:none;
+  color:var(--white);
+  font-family:var(--ff-b);
+  font-size:1rem;
+  font-weight:300;
+  padding:.9rem 1.1rem;
+  caret-color:var(--amber);
+}
+#searchInput::placeholder{color:var(--muted);font-style:italic}
+#searchBtn{
+  font-family:var(--ff-d);
+  font-size:.95rem;
+  letter-spacing:.14em;
+  background:var(--amber);
+  color:var(--ink);
+  border:none;
+  padding:0 1.8rem;
+  cursor:pointer;
+  transition:background .2s, letter-spacing .18s;
+  white-space:nowrap;
+  flex-shrink:0;
+}
+#searchBtn:hover{background:var(--amber2);letter-spacing:.2em}
+
+/* Radius */
+.radius-row{
+  display:flex;
+  align-items:center;
+  gap:1.2rem;
+  margin-top:1.8rem;
+}
+.radius-label{
+  font-family:var(--ff-m);
+  font-size:.65rem;
+  letter-spacing:.14em;
+  color:var(--muted);
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+.radius-label em{
+  font-style:normal;
+  color:var(--amber2);
+  font-size:.78rem;
+}
+input[type=range]{
+  -webkit-appearance:none;
+  appearance:none;
+  background:transparent;
+  flex:1;
+  max-width:280px;
+  height:20px;
+  cursor:pointer;
+}
+input[type=range]::-webkit-slider-runnable-track{
+  height:1px;
+  background:var(--rule2);
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  width:12px;height:12px;
+  background:var(--amber);
+  border-radius:0;
+  margin-top:-5.5px;
+  transition:transform .15s;
+}
+input[type=range]:hover::-webkit-slider-thumb{transform:scale(1.4)}
+
+/* Action buttons */
+.action-row{
+  display:flex;
+  gap:.6rem;
+  flex-wrap:wrap;
+  margin-top:1.4rem;
+  align-items:center;
+}
+.btn{
+  font-family:var(--ff-m);
+  font-size:.62rem;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  border:1px solid var(--rule2);
+  background:transparent;
+  color:var(--cream2);
+  padding:.5rem 1rem;
+  cursor:pointer;
+  transition:border-color .2s,color .2s,background .2s;
+  position:relative;
+  overflow:hidden;
+}
+.btn:hover{
+  border-color:var(--amber);
+  color:var(--amber2);
+  background:rgba(196,127,26,.07);
+}
+.btn.muted-btn{
+  border-color:var(--rule);
+  color:var(--muted);
+}
+.btn.muted-btn:hover{
+  border-color:var(--rule2);
+  color:var(--cream2);
+  background:rgba(255,255,255,.03);
+}
+
+/* Divider between action groups */
+.divider{width:1px;height:20px;background:var(--rule2);flex-shrink:0}
+
+/* Status */
+#status{
+  font-family:var(--ff-m);
+  font-size:.62rem;
+  letter-spacing:.08em;
+  color:var(--muted);
+  margin-top:1.4rem;
+  padding-left:.05rem;
+}
+#status.ok{color:#5a8a5a}
+#status.err{color:#a05050}
+
+/* ── RESULTS ── */
+#resultsSection{padding:2.4rem 0}
+.section-header{
+  display:flex;
+  align-items:baseline;
+  gap:1rem;
+  margin-bottom:1.6rem;
+  padding-bottom:.9rem;
+  border-bottom:1px solid var(--rule);
+}
+.section-header h2{
+  font-family:var(--ff-d);
+  font-size:1.6rem;
+  letter-spacing:.1em;
+  color:var(--white);
+}
+.result-count{
+  font-family:var(--ff-m);
+  font-size:.62rem;
+  letter-spacing:.12em;
+  color:var(--muted);
+}
+.results{list-style:none}
+.job{
+  background:var(--ink2);
+  border:1px solid var(--rule);
+  border-left:3px solid var(--amber);
+  padding:1.2rem 1.4rem;
+  margin-bottom:.7rem;
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:1rem;
+  transition:border-color .2s,background .2s;
+  animation:up .4s cubic-bezier(.16,1,.3,1) both;
+}
+.job:hover{
+  border-color:var(--amber);
+  background:#1a1a17;
+}
+.job-title{
+  font-family:var(--ff-b);
+  font-size:1.05rem;
+  font-weight:400;
+  color:var(--white);
+  margin-bottom:.25rem;
+}
+.job-meta{
+  font-family:var(--ff-m);
+  font-size:.62rem;
+  letter-spacing:.1em;
+  color:var(--muted);
+  text-transform:uppercase;
+}
+.job-meta span{margin-right:.9rem}
+.job-right{text-align:right;flex-shrink:0}
+.distance{
+  font-family:var(--ff-d);
+  font-size:1.4rem;
+  letter-spacing:.06em;
+  color:var(--amber);
+  line-height:1;
+}
+.distance-unit{
+  font-family:var(--ff-m);
+  font-size:.58rem;
+  color:var(--muted);
+  letter-spacing:.12em;
+  display:block;
+  margin-top:.2rem;
+}
+.job-tag{
+  display:inline-block;
+  font-family:var(--ff-m);
+  font-size:.55rem;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  border:1px solid var(--rule2);
+  color:var(--muted);
+  padding:.2rem .5rem;
+  margin-top:.5rem;
+}
+
+/* ── FOOTER ── */
+footer{
+  border-top:1px solid var(--rule);
+  padding:1.4rem 2.5rem;
+}
+.footer-inner{
+  max-width:960px;
+  margin:0 auto;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+footer small{
+  font-family:var(--ff-m);
+  font-size:.58rem;
+  letter-spacing:.1em;
+  color:var(--muted);
+}
+.footer-mark{
+  font-family:var(--ff-d);
+  font-size:.9rem;
+  letter-spacing:.18em;
+  color:var(--rule2);
+}
+
+/* Empty state */
+.empty{
+  text-align:center;
+  padding:4rem 0;
+  border:1px dashed var(--rule2);
+}
+.empty-glyph{
+  font-family:var(--ff-d);
+  font-size:4rem;
+  color:var(--rule2);
+  letter-spacing:.1em;
+}
+.empty-text{
+  font-family:var(--ff-b);
+  font-style:italic;
+  color:var(--muted);
+  margin-top:.6rem;
+  font-size:.95rem;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top-line"></div>
+  <div class="header-inner">
+    <div>
+      <div class="brand-label">Opportunity Engine · v2.0</div>
+      <h1>Nearby<br>Jobs</h1>
+      <p class="tagline">Find roles near you by keyword — no back-end required.</p>
+    </div>
+    <div class="header-badge">
+      <div class="live-dot"><span class="dot"></span>LIVE</div>
+      <div class="version">CLIENT-SIDE ONLY</div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="controls">
+
+    <div class="search-wrap">
+      <span class="search-field-label">Search</span>
+      <div class="search-row">
+        <input id="searchInput" type="search"
+          placeholder="Title, company or keywords — e.g. 'engineer', 'react'" />
+        <button id="searchBtn">Search</button>
+      </div>
+    </div>
+
+    <div class="radius-row">
+      <span class="radius-label">Radius&nbsp;&nbsp;<em id="radiusValue">50</em>&nbsp;km</span>
+      <input id="radiusRange" type="range" min="1" max="200" value="50"/>
+    </div>
+
+    <div class="action-row">
+      <button class="btn" id="useLocationBtn">⌖ My Location</button>
+      <button class="btn" id="useSampleBtn">⊙ Sample Location</button>
+      <div class="divider"></div>
+      <button class="btn muted-btn" id="clearBtn">✕ Clear</button>
+    </div>
+
+    <p id="status">Click "My Location" to compute distances. Search works without it.</p>
+
+  </section>
+
+  <section id="resultsSection">
+    <div class="section-header">
+      <h2>Results</h2>
+      <span class="result-count" id="resultCount">— awaiting query</span>
+    </div>
+    <ul id="results" class="results">
+      <li class="empty">
+        <div class="empty-glyph">◎</div>
+        <p class="empty-text">Enter a keyword to surface nearby opportunities.</p>
+      </li>
+    </ul>
+  </section>
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <small>Your location is processed locally and never transmitted.</small>
+    <span class="footer-mark">NJ</span>
+  </div>
+</footer>
+
+<script>
+const radiusRange = document.getElementById('radiusRange');
+const radiusValue = document.getElementById('radiusValue');
+radiusRange.addEventListener('input', () => { radiusValue.textContent = radiusRange.value; });
+
+const SAMPLE_JOBS = [
+  {title:'Senior React Engineer',company:'Finstack',location:'Mumbai',lat:19.076,lng:72.877,type:'Full-time'},
+  {title:'UX Designer',company:'Pixel Studio',location:'Pune',lat:18.521,lng:73.856,type:'Contract'},
+  {title:'Backend Engineer',company:'CloudBase',location:'Bengaluru',lat:12.971,lng:77.594,type:'Full-time'},
+  {title:'Product Manager',company:'LaunchPad',location:'Delhi',lat:28.613,lng:77.209,type:'Full-time'},
+  {title:'Data Scientist',company:'Analytiq',location:'Hyderabad',lat:17.385,lng:78.487,type:'Remote'},
+  {title:'DevOps Engineer',company:'InfraCore',location:'Chennai',lat:13.082,lng:80.270,type:'Full-time'},
+];
+
+let userLat = null, userLng = null;
+const resultCount = document.getElementById('resultCount');
+
+function haversine(lat1,lng1,lat2,lng2){
+  const R=6371,dLat=(lat2-lat1)*Math.PI/180,dLng=(lng2-lng1)*Math.PI/180;
+  const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+
+function renderJobs(jobs){
+  const list = document.getElementById('results');
+  if(!jobs.length){
+    list.innerHTML='<li class="empty"><div class="empty-glyph">◌</div><p class="empty-text">No roles matched — try broadening your search.</p></li>';
+    resultCount.textContent='0 results';
+    return;
+  }
+  resultCount.textContent = jobs.length + ' result' + (jobs.length>1?'s':'') + ' found';
+  list.innerHTML = jobs.map((j,i)=>`
+    <li class="job" style="animation-delay:${i*0.06}s">
+      <div>
+        <div class="job-title">${j.title}</div>
+        <div class="job-meta">
+          <span>${j.company}</span>
+          <span>${j.location}</span>
+        </div>
+        <span class="job-tag">${j.type}</span>
+      </div>
+      <div class="job-right">
+        ${j.dist!=null?`<div class="distance">${Math.round(j.dist)}</div><span class="distance-unit">km away</span>`:'<div class="distance" style="color:var(--rule2)">—</div>'}
+      </div>
+    </li>`).join('');
+}
+
+document.getElementById('searchBtn').addEventListener('click', runSearch);
+document.getElementById('searchInput').addEventListener('keydown', e=>{ if(e.key==='Enter') runSearch(); });
+
+function runSearch(){
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  let jobs = SAMPLE_JOBS.map(j=>({...j}));
+  if(q) jobs = jobs.filter(j=>(j.title+j.company+j.location).toLowerCase().includes(q));
+  const radius = +document.getElementById('radiusRange').value;
+  if(userLat!=null){
+    jobs = jobs.map(j=>({...j,dist:haversine(userLat,userLng,j.lat,j.lng)}))
+               .filter(j=>j.dist<=radius)
+               .sort((a,b)=>a.dist-b.dist);
+  }
+  renderJobs(jobs);
+}
+
+document.getElementById('useLocationBtn').addEventListener('click',()=>{
+  const st = document.getElementById('status');
+  st.textContent='Requesting location…';
+  st.className='';
+  navigator.geolocation.getCurrentPosition(p=>{
+    userLat=p.coords.latitude; userLng=p.coords.longitude;
+    st.textContent=`Location set: ${userLat.toFixed(3)}, ${userLng.toFixed(3)}`;
+    st.className='ok';
+  },()=>{ st.textContent='Location denied. Using sample or searching without distance.'; st.className='err'; });
+});
+
+document.getElementById('useSampleBtn').addEventListener('click',()=>{
+  userLat=19.076; userLng=72.877;
+  const st=document.getElementById('status');
+  st.textContent='Sample location set: Mumbai (19.076, 72.877)';
+  st.className='ok';
+});
+
+document.getElementById('clearBtn').addEventListener('click',()=>{
+  document.getElementById('searchInput').value='';
+  userLat=null; userLng=null;
+  document.getElementById('status').textContent='Click "My Location" to compute distances. Search works without it.';
+  document.getElementById('status').className='';
+  resultCount.textContent='— awaiting query';
+  document.getElementById('results').innerHTML='<li class="empty"><div class="empty-glyph">◎</div><p class="empty-text">Enter a keyword to surface nearby opportunities.</p></li>';
+});
+</script>
+</body>
+</html>
